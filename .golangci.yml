@@ -1,0 +1,100 @@
+version: "2"
+
+run:
+  timeout: 5m                     # Максимальное время выполнения линтинга
+  relative-path-mode: gomod       # Обрабатывает файлы относительно модуля go.mod
+  issues-exit-code: 1             # Выход с кодом 1 при наличии проблем
+  tests: true                    # Анализировать также тестовые файлы
+  modules-download-mode: readonly # Зависимости не изменяются, только читаются
+
+output:
+  formats:
+    text:
+      print-linter-name: true    # Показывать имя линтера в выводе
+      print-issued-lines: true   # Показывать строки с проблемами
+      colors: true               # Цветной вывод
+
+issues:
+  max-issues-per-linter: 0        # Максимум проблем на линтер (0 — без ограничения)
+  max-same-issues: 0              # Максимум одинаковых проблем
+  uniq-by-line: true              # Уникальность по строкам
+
+linters:
+  default: standard               # Использовать стандартный набор линтеров
+  enable:                        # Дополнительные включенные линтеры
+    - errcheck
+    - staticcheck
+    - govet
+    - gocritic
+    - revive
+    - unused
+    - gosec
+    - depguard
+    - bodyclose
+    - asciicheck
+    - cyclop
+    - dupl
+    - ineffassign
+    - unparam
+    - errorlint
+    - errname
+    - forbidigo
+    - contextcheck
+    - containedctx
+  disable:                       # Линтеры, отключенные вручную
+    - gocyclo                    # Отключен из-за использования cyclop
+    - lll                        # Длинные строки отключены
+
+  exclusions:
+    generated: strict            # Игнорировать сгенерированные файлы полностью
+    rules:
+      - path: _test\.go          # Для тестовых файлов отключить некоторые линтеры
+        linters:
+          - cyclop
+          - dupl
+          - gosec
+
+  settings:                      # Специфичные настройки для отдельных линтеров
+
+    gosec:
+      config:
+        global:
+          audit: true             # Включить аудит безопасности
+          show-ignored: true     # Показывать игнорируемые предупреждения
+        severity: "medium"       # Минимальная важность проблем
+        confidence: "medium"     # Минимальная уверенность для проблем
+
+    cyclop:
+      max-complexity: 20         # Максимально допустимая цикломатическая сложность
+
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: io/ioutil      # Запрет на использование устаревшего пакета io/ioutil
+              desc: "Использование устаревшего пакета io/ioutil запрещено (замените вызовы на аналоги из пакетов os/io)"
+
+    revive:
+      severity: warning          # Уровень предупреждений
+
+    forbidigo:
+      exclude-godoc-examples: true  # Исключить проверку примеров в документации
+      analyze-types: true           # Анализ типов для паттернов
+      forbid:
+        - pattern: '^time\.Sleep$'     # Запрет на использование time.Sleep
+          msg: "Запрещено использовать time.Sleep в продакшен-коде (используй таймеры/контекст)"
+        - pattern: '^http\.DefaultClient$' # Запрет http.DefaultClient
+          msg: "Не используй http.DefaultClient (нет таймаутов); создай *http.Client с таймаутами"
+
+formatters:
+  enable:                        # Включенные форматтеры
+    - gofumpt
+  settings:
+    gofumpt:
+      extra-rules: true          # Дополнительные правила для gofumpt
+    gci:
+      sections:                  # Секции для сортировки импортов
+        - Standard
+        - Default
+        - Prefix(github.com/V1merX/pr-review-assignment)
+      no-inline-comments: false  # Разрешить комментарии в строке с импортом
