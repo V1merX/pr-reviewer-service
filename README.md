@@ -90,72 +90,6 @@ go run ./cmd/api/main.go
   make test             
 ```
 
-### Specific tests
-
-```bash
-# Unit tests of services
-go test ./internal/service -v
-
-# HTTP tests
-go test ./internal/http -v
-
-# Load tests (1000 operations)
-go test ./internal/http -run Load -v
-
-# E2E tests (5 scenarios)
-go test ./internal/http -run E2E -v
-```
-
-
-##  Project structure
-
-```
-├──config/config.yml 
-├── cmd/api/
-│   └── main.go                
-├── internal/
-│   ├── api/
-│   │   ├── types.gen.go        
-│   │   └── server.gen.go       
-│   ├── config/
-│   │   └── config.go            
-│   ├── http/
-│   │   ├── server.go           
-│   │   ├── server_test.go      
-│   │   ├── load_test.go       
-│   │   ├── e2e_test.go         
-│   │   └── handler/
-│   │       └── server_handler.go 
-│   ├── repository/
-│   │   ├── team_repository.go
-│   │   ├── user_repository.go
-│   │   ├── pull_request_repository.go     
-│   │   ├── inmemory/           
-│   │   └── postgres/           
-│   │       ├── db.go
-│   │       ├── team_repository.go
-│   │       ├── user_repository.go
-│   │       └── pull_request_repository.go
-│   └── service/
-│       ├── team_service.go
-│       ├── team_service_test.go
-│       ├── user_service.go
-│       ├── user_service_test.go
-│       ├── pull_request_service.go
-│       └── pull_request_service_test.go
-├── migrations/
-│   └── 001_init.sql            
-├── .golangci.yml               
-├── Makefile                    
-├── Dockerfile                 
-├── docker-compose.yml          
-├── openapi.yml                
-├── go.mod & go.sum             
-└── README.md                  
-```
-
----
-
 ##  Solution Architecture
 
 ### Layered Architecture
@@ -167,7 +101,7 @@ Service Layer (business logic)
     ↓
 Repository Layer (data access)
     ↓
-PostgreSQL / In-Memory Storage
+PostgreSQL
 ```
 
 ### Key Design Decisions
